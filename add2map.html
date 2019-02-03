@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+	<head>
+		<title>add2map | Power by Folium</title>
+		<meta name="description" content="add coordinates to the map">
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<meta name="author" content="Leonel Pereira & The Community">
+		<script>L_PREFER_CANVAS = false; L_NO_TOUCH = false; L_DISABLE_3D = false;</script>
+		<!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+		<!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css" /-->
+		<!--script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script-->
+		<!--script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script-->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/leaflet@1.2.0/dist/leaflet.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.2.0/dist/leaflet.css" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css" />
+		<link rel="stylesheet" href="https://rawgit.com/python-visualization/folium/master/folium/templates/leaflet.awesome.rotate.css" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/leaflet.markercluster.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.Default.css" />
+		<style>
+			#map {
+				position : relative;
+				width : 100.0%;
+				height: 100.0%;
+				left: 0.0%;
+				top: 0.0%;
+				
+			}			
+			
+			html, body {
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				padding: 0;
+				overflow: hidden; //disable scroll
+			}
+			ul {
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+				overflow: hidden;
+				border: 1px solid #e7e7e7;
+				background-color: #f3f3f3;
+				position: -webkit-sticky; /* Safari */
+				position: sticky; //make navbar stick to the top
+				top: 0;
+			}
+			
+			li {
+				float: left;
+			}
+
+			li a {
+				display: block;
+				color: #666;
+				text-align: center;
+				padding: 14px 16px;
+				text-decoration: none;
+			}
+
+			li a:hover:not(.active) {
+				background-color: #ddd;
+			}
+
+			li a.active {
+				color: white;
+				background-color: #4CAF50;
+			}
+			
+			input[type=text]{
+				height: 30px;
+				width: 180px;
+				margin: 8px;
+				display: inline-block;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+				box-sizing: border-box;
+			}
+			
+			#notification{
+				margin:12px;
+				font-weight:bold;
+				color:#4CAF50;
+			}
+			
+		</style>	
+		
+	</head>
+	<body>
+		<ul>
+			<li><a class="active" href="" onclick="#">add2map</a></li>
+			<li></li>
+			<li>
+				<form id="latLonForm" name="latLonForm">
+					<input type="text" id="lat" name="lat" placeholder="Latitude e.g. 29.7787" required>
+					<input type="text" id="lon" name="lon" placeholder="Longitude e.g. -95.4218" required>
+					<button type="button" onclick="add2map();">add2map</button>
+				</form>
+			</li>
+			<li><p id="notification"></p></li>
+		</ul>
+		<div class="folium-map" id="map" ></div>
+		
+	</body>
+	<script> 
+		var bounds = null;
+		var map = L.map(
+			'map',
+			{center: [30,-30],
+			zoom: 2,
+			maxBounds: bounds,
+			layers: [],
+			worldCopyJump: false,
+			crs: L.CRS.EPSG3857
+			});
+			
+		//map.add_child(L.LatLngPopup());
+				
+		var tile_layer = L.tileLayer(
+					'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+					{
+						"attribution": null, 
+						"detectRetina": false, 
+						"maxZoom": 18, 
+						"minZoom": 1, 
+						"noWrap": false, 
+						"subdomains": "abc"
+					}
+					
+		).addTo(map);
+			
+		var latLngPopup = L.popup();
+		function latLngPop(e) {
+			latLngPopup
+			.setLatLng(e.latlng)
+			.setContent("Latitude: " + e.latlng.lat.toFixed(4) + "<br>Longitude: " + e.latlng.lng.toFixed(4))
+			.openOn(map);
+		}
+		map.on('click', latLngPop);
+		
+		var markerCluster = L.markerClusterGroup({           
+		});
+		
+		map.addLayer(markerCluster);
+					
+		var marker = L.marker(
+			[-8.8647,13.2880],
+			{
+				icon: new L.Icon.Default()
+			}
+		)
+		.addTo(markerCluster);	
+		var popup = L.popup({maxWidth: '300'});       
+		var html = $("<div>lat: -8.8647<br>lon: 13.2880</div>")[0];
+		popup.setContent(html);
+		marker.bindPopup(popup);
+
+		var marker = L.marker(
+			[29.7787,-95.4218],
+			{
+				icon: new L.Icon.Default()
+			}
+		)
+		.addTo(markerCluster);
+		var popup = L.popup({maxWidth: '300'});       
+		var html = $("<div>lat: 29.7787<br>lon: -95.4218</div>")[0];
+		popup.setContent(html);
+		marker.bindPopup(popup);
+
+		var marker = L.marker(
+			[39.7547,-95.4218],
+			{
+				icon: new L.Icon.Default()
+			}
+		)
+		.addTo(markerCluster);
+		var popup = L.popup({maxWidth: '300'});       
+		var html = $("<div>lat: 39.7547<br>lon: -105.2212</div>")[0];
+		popup.setContent(html);
+		marker.bindPopup(popup);
+
+ 		
+		function add2map(){
+			/*
+			GET INPUT FROM USER (IPADDR, LAT, LONG) AND
+			ADD TO THE MAP
+			*/
+			
+			var lat 	= document.getElementById("lat").value;
+			var lon 	= document.getElementById("lon").value;
+			lat			= parseFloat(lat);
+			lon			= parseFloat(lon);
+			
+			var inputs = document.forms['latLonForm'].getElementsByTagName('input');
+			for(var i = 0; i < inputs.length; i++){
+				console.log(inputs[i].name + ": " + inputs[i].value);
+			}
+			
+			if(!lat || !lon){
+			var msg = "Please fill out the form.";
+			document.getElementById("notification").innerText = msg;
+			console.log(msg);
+			} else {
+				var marker = L.marker(
+					[lat,lon],
+					{
+						icon: new L.Icon.Default()
+					}
+				)
+				.addTo(markerCluster);
+				
+				var popup = L.popup({maxWidth: '300'});       
+				var html = $("<div>lat: " + lat + "<br>lon: " + lon + "</div>")[0];
+				popup.setContent(html);
+
+				marker.bindPopup(popup);
+			}
+		return false;
+		} 
+	</script>

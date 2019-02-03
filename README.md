@@ -10,7 +10,7 @@ Facilitate the use of Folium geolocation.
 <table>
   <tr>
     <td>
-      <img alt="homepage" src="add2map.jpg">
+      <img alt="homepage" src="docs/add2map.jpg">
     </td>
   </tr>
 </table>
